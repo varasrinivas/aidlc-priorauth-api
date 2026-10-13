@@ -26,4 +26,23 @@ class PendingRequestsControllerTest {
                 .andExpect(jsonPath("$[0].id").value("PA-10231"))
                 .andExpect(jsonPath("$[0].receivedAt").value("2026-10-01"));
     }
+
+    @Test // FR3: the age and the flag travel with each row; 1 Oct -> 13 Oct is 7 business days (12 Oct is a TX-01 holiday)
+    void eachRowCarriesItsAgeAndFlag() throws Exception {
+        mvc.perform(get("/requests/pending").param("asOf", "2026-10-13"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$[0].id").value("PA-10231"))
+                .andExpect(jsonPath("$[0].ageBusinessDays").value(7))
+                .andExpect(jsonPath("$[0].overLimit").value(true))
+                .andExpect(jsonPath("$[0].ageLabel").value("7 bd OVER 5"))
+                .andExpect(jsonPath("$[1].id").value("PA-10244"))
+                .andExpect(jsonPath("$[1].ageBusinessDays").value(4))
+                .andExpect(jsonPath("$[1].overLimit").value(false));
+    }
+
+    @Test // FR1: PA-10231 arrived on 1 Oct, so an as-of of 30 Sep is the caller's error: 400, not 500
+    void asOfBeforeReceivedIsABadRequest() throws Exception {
+        mvc.perform(get("/requests/pending").param("asOf", "2026-09-30"))
+                .andExpect(status().isBadRequest());
+    }
 }
