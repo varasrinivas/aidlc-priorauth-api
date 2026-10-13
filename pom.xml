@@ -14,7 +14,7 @@
 
   <groupId>com.acmehealth</groupId>
   <artifactId>priorauth-api</artifactId>
-  <version>1.0.2</version>
+  <version>1.1.0</version>
   <name>priorauth-api</name>
   <description>The prior-auth API the reviewer screen reads: pending requests per tenant.</description>
 
